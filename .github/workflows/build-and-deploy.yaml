@@ -20,7 +20,7 @@ jobs:
       - uses: actions/checkout@v4
       # - run: make build-image
       # set up docker buildx for caching
-      - name: Set up Docker Buildx
+      - name: set up docker buildx
         uses: docker/setup-buildx-action@v3
 
         # loog in to aws ecr
@@ -43,8 +43,8 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha, mode=max
 
-      # Build and push final image
-      - name: Build and push final image
+      # build and push final image
+      - name: build and push final image
         uses: docker/build-push-action@v6
         with:
           context: .
@@ -65,7 +65,7 @@ jobs:
       - uses: actions/checkout@v4
 
       # Log in to AWS ECR
-      - name: Log in to AWS ECR
+      - name: log in to aws ecr
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_DEFAULT_REGION: ${{ vars.AWS_DEFAULT_REGION }}
@@ -73,8 +73,8 @@ jobs:
         # run: make build-image-pull
         run: aws ecr get-login-password --region ${{ vars.AWS_DEFAULT_REGION }} | docker login --username AWS --password-stdin ${{ env.AWS_ECR_DOMAIN }}
 
-      # Pull the built image
-      - name: Pull Docker image
+      # pull the built image
+      - name: pull docker image
         run: docker pull ${{ env.BUILD_IMAGE }}:${{ env.GIT_SHA }}
       - run: make up
 
@@ -106,16 +106,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-        # Log in to AWS ECR
-      - name: Log in to AWS ECR
+        # log in to aws ecr
+      - name: log in to aws ecr
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ${{ vars.AWS_DEFAULT_REGION }}
         run: aws ecr get-login-password --region ${{ vars.AWS_DEFAULT_REGION }} | docker login --username AWS --password-stdin ${{ env.AWS_ECR_DOMAIN }}
 
-      # Pull the built image
-      - name: Pull Docker image
+      # pull the built image
+      - name: pull the built image
         run: docker pull ${{ env.BUILD_IMAGE }}:${{ env.GIT_SHA }}
       # - run: make build-image-pull
       - run: make build-image-migrate
