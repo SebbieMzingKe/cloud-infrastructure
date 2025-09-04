@@ -87,11 +87,11 @@ down:
 up:
 	docker compose up --detach
 
-deploy:
-	AWS_ACCOUNT_ID=$(AWS_ACCOUNT_ID) \
-	AWS_DEFAULT_REGION=$(AWS_DEFAULT_REGION) \
-	AWS_ECR_DOMAIN=$(AWS_ECR_DOMAIN) \
-	./deploy.sh
+# deploy:
+# 	AWS_ACCOUNT_ID=$(AWS_ACCOUNT_ID) \
+# 	AWS_DEFAULT_REGION=$(AWS_DEFAULT_REGION) \
+# 	AWS_ECR_DOMAIN=$(AWS_ECR_DOMAIN) \
+# 	./deploy.sh
 
 migrate:
 	goose -dir "$(MIGRATION_DIR)" up
