@@ -15,7 +15,7 @@ build:
 build-image:
 	docker buildx build \
 		--platform "linux/amd64" \
-		--tag "$(BUILD_IMAGE):$(BUILD_TAG)" \
+		--tag "$(BUILD_IMAGE):$(GIT_SHA)-build" \
 		--target "build" \
 		.
 	docker buildx build \
