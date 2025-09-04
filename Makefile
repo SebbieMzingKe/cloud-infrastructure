@@ -6,9 +6,8 @@ GIT_SHA := $(shell git rev-parse HEAD)
 BUILD_IMAGE := $(AWS_ECR_DOMAIN)/cloud-infra
 BUILD_TAG := $(if $(BUILD_TAG), $(BUILD_TAG),latest)
 
-DOCKERIZE_HOST := $(shell echo "$(GOOSE_DBSTRING)" | sed -E 's|.*@([^:/?]+).*|\1|')
-DOCKERIZE_URL  := tcp://$(if $(DOCKERIZE_HOST),$(DOCKERIZE_HOST),localhost):5432
-
+DOCKERIZE_HOST := $(shell echo "$(GOOSE_DBSTRING)" | cut -d'@' -f2 | cut -d':' -f1)
+DOCKERIZE_URL := tcp://$(if $(DOCKERIZE_HOST),$(DOCKERIZE_HOST),localhost):5432
 
 # DOCKERIZE_HOST := $(shell echo $(GOOSE_DBSTRING) | cut -d "@" -f 2 | cut -d ":" -f 1)
 # DOCKERIZE_URL := tcp://$(if $(DOCKERIZE_HOST), $(DOCKERIZE_HOST):5432, localhost:5432)
