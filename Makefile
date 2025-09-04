@@ -31,7 +31,7 @@ build-image-login:
 	$(AWS_ECR_DOMAIN)
 
 build-image-push: build-image-login
-	docker image push$(BUILD_IMAGE):$(BUILD_TAG)
+	docker image push$(BUILD_IMAGE):$(GIT_SHA)
 
 build-image-pull: build-image-login
 	docker image pull $(BUILD_IMAGE):$(GIT_SHA)
