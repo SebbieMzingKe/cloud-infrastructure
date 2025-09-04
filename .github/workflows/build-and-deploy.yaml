@@ -49,7 +49,9 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ env.BUILD_IMAGE }}:${{ env.GIT_SHA }}
+          tags: |
+            ${{ env.BUILD_IMAGE }}:${{ env.GIT_SHA }}
+            ${{ env.BUILD_IMAGE }}:latest
           platforms: linux/amd64
           cache-from: |
             type=gha
