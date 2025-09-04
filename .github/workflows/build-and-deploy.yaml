@@ -55,7 +55,7 @@ jobs:
       DOCKERIZE_URL: ${{ secrets.GOOSE_DBSTRING}}
       GOOSE_DBSTRING: ${{ secrets.GOOSE_DBSTRING}}
       GOOSE_DRIVER: ${{ vars.GOOSE_DRIVER }}
-    # if: github.ref == 'refs/head/main' || github.ref == 'refs/head/prod'
+    # if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/prod'
     needs:
       - test
     runs-on: ubuntu-latest
@@ -67,7 +67,7 @@ jobs:
       - run: |
           BUILD_TAG=staging
 
-          if [[ "${GITHUB_REF}" == "refs/head/prod"]]; then
+          if [[ "${GITHUB_REF}" == "refs/head/prod" ]]; then
             BUILD_TAG=prod
           fi
 
