@@ -5,20 +5,56 @@ on:
   push:
     branches:
       - main
+env:
+  AWS_ACCOUNT_ID: ${{ vars.AWS_ACCOUNT_ID }}
+  AWS_DEFAULT_REGION: ${{ vars.AWS_DEFAULT_REGION }}
+  AWS_ECR_DOMAIN: ${{ vars.AWS_ACCOUNT_ID }}.dkr.ecr.${{ vars.AWS_DEFAULT_REGION }}.amazonaws.com
+  BUILD_IMAGE: ${{ vars.AWS_ACCOUNT_ID }}.dkr.ecr.${{ vars.AWS_DEFAULT_REGION }}.amazonaws.com/cloud-infra
+  GIT_SHA: ${{ github.sha }}
+  BUILD_TAG: latest
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: make build-image
+      # - run: make build-image
+      # set up docker buildx for caching
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
+        # loog in to aws ecr
       - env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_DEFAULT_REGION: ${{ vars.AWS_DEFAULT_REGION }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        run: make build-image-push
+        # run: make build-image-push
+        run: aws ecr get-login-password --region ${{ vars.AWS_DEFAULT_REGION }} | docker login --username AWS --password-stdin ${{ env.AWS_ECR_DOMAIN }}
 
+        # build and push build stage image
+      - name: build and push build stage
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: ${{ env.BUILD_IMAGE }}:${{ env.GIT_SHA }}-build
+          target: build
+          platforms: linux/amd64
+          cache-from: type=gha
+          cache-to: type=gha, mode=max
+
+      # Build and push final image
+      - name: Build and push final image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: ${{ env.BUILD_IMAGE }}:${{ env.GIT_SHA }}
+          platforms: linux/amd64
+          cache-from: |
+            type=gha
+            ${{ env.BUILD_IMAGE }}:${{ env.GIT_SHA }}-build
+          cache-to: type=gha,mode=max
   test:
     needs:
       - build
@@ -26,12 +62,18 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - env:
+      # Log in to AWS ECR
+      - name: Log in to AWS ECR
+        env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_DEFAULT_REGION: ${{ vars.AWS_DEFAULT_REGION }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        run: make build-image-pull
+        # run: make build-image-pull
+        run: aws ecr get-login-password --region ${{ vars.AWS_DEFAULT_REGION }} | docker login --username AWS --password-stdin ${{ env.AWS_ECR_DOMAIN }}
 
+      # Pull the built image
+      - name: Pull Docker image
+        run: docker pull ${{ env.BUILD_IMAGE }}:${{ env.GIT_SHA }}
       - run: make up
 
       - env:
@@ -62,7 +104,18 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - run: make build-image-pull
+        # Log in to AWS ECR
+      - name: Log in to AWS ECR
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ vars.AWS_DEFAULT_REGION }}
+        run: aws ecr get-login-password --region ${{ vars.AWS_DEFAULT_REGION }} | docker login --username AWS --password-stdin ${{ env.AWS_ECR_DOMAIN }}
+
+      # Pull the built image
+      - name: Pull Docker image
+        run: docker pull ${{ env.BUILD_IMAGE }}:${{ env.GIT_SHA }}
+      # - run: make build-image-pull
       - run: make build-image-migrate
       - run: make build-image-promote
 
@@ -77,7 +130,7 @@ jobs:
       #     ECS_SERVICE_NAME=${ECS_CLUSTER_NAME}
 
       #     echo "BUILD_TAG: ${BUILD_TAG}"
-      #     echo "ECS_CLUSTER_NAME: ${ECS_CLUSTER_NAME}" 
+      #     echo "ECS_CLUSTER_NAME: ${ECS_CLUSTER_NAME}"
 
       #     make BUILD_TAG=$BUILD_TAG build-image-promote
       #     make ECS_CLUSTER_NAME=$ECS_CLUSTER_NAME ECS_SERVICE_NAME=$ECS_SERVICE_NAME deploy
