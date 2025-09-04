@@ -37,7 +37,7 @@ jobs:
       - env:
            GOOSE_DBSTRING: postgresql://postgres:password@localhost:5432/postgres?sslmode=disable
            GOOSE_DRIVER: postgres
-        run: make-build-image-migrate
+        run: make build-image-migrate
 
       - if: always()
         run: make down
