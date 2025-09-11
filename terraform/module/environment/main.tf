@@ -27,7 +27,7 @@ module "cluster" {
   capacity_providers = {
     "spot" = {
       instance_type = "t3a.medium"
-      markettype    = "spot"
+      market_type    = "spot"
     }
   }
 }
