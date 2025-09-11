@@ -4,7 +4,7 @@ resource "aws_cloudfront_vpc_origin" "this" {
     http_port              = 80
     https_port             = 443
     name                   = "cluster-${var.name}"
-    origin_protocol_policy = "http_only"
+    origin_protocol_policy = "http-only"
 
     origin_ssl_protocols {
       items    = ["TLSv1.2"]
@@ -15,7 +15,7 @@ resource "aws_cloudfront_vpc_origin" "this" {
 
 resource "aws_cloudfront_distribution" "this" {
   enabled     = true
-  price_class = "priceClass_100"
+  price_class = "PriceClass_100"
 
   origin {
     domain_name = aws_lb.this.dns_name
@@ -36,7 +36,7 @@ resource "aws_cloudfront_distribution" "this" {
       query_string = true
 
       cookies {
-        forward = none
+        forward = "none"
       }
     }
   }
