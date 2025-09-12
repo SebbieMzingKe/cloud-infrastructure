@@ -16,7 +16,7 @@ TASK_ARN=$(aws ecs run-task \
 	--cluster "${ECS_CLUSTER_NAME}" \
 	--launch-type EC2 \
 	--overrides file://overrides.txt \
-	--task-definition "${ECS_SERVICE_NAME}" | jq -r '.tasks[0].taskArn')
+	--task-definition "${ECS_SERVICE_NAME}-service" | jq -r '.tasks[0].taskArn')
 
 echo "Running task: ${TASK_ARN}"
 
