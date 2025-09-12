@@ -63,8 +63,8 @@ jobs:
     concurrency:
       cancel-in-progress: false
       group: tf-lock
-    # environment:
-    #   name: prod
+    environment:
+      name: prod
 
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
