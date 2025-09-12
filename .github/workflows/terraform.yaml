@@ -84,7 +84,7 @@ jobs:
         with:
           name: tf-plan
 
-      - run: mv terraform.tfplan ./terraform/terrafform.tfplan
+      - run: mv terraform.tfplan ./terraform/terraform.tfplan
 
       - run: terraform init
         working-directory: ./terraform
