@@ -121,18 +121,19 @@ jobs:
       - run: make build-image-migrate
       - run: make build-image-promote
 
-      # - run: |
-      #     BUILD_TAG=staging
+      - run: |
+          BUILD_TAG=staging
 
-      #     if [[ "${GITHUB_REF}" == "refs/head/prod" ]]; then
-      #       BUILD_TAG=prod
-      #     fi
+          if [[ "${GITHUB_REF}" == "refs/head/prod" ]]; then
+            BUILD_TAG=prod
+          fi
 
-      #     ECS_CLUSTER_NAME=${BUILD_TAG}
-      #     ECS_SERVICE_NAME=${ECS_CLUSTER_NAME}
+          ECS_CLUSTER_NAME=${BUILD_TAG}
+          ECS_SERVICE_NAME=${ECS_CLUSTER_NAME}
 
-      #     echo "BUILD_TAG: ${BUILD_TAG}"
-      #     echo "ECS_CLUSTER_NAME: ${ECS_CLUSTER_NAME}"
+          echo "BUILD_TAG: ${BUILD_TAG}"
+          echo "ECS_CLUSTER_NAME: ${ECS_CLUSTER_NAME}"
+          echo "ECS_SERVICE_NAME: ${ECS_SERVICE_NAME}"
 
-      #     make BUILD_TAG=$BUILD_TAG build-image-promote
-      #     make ECS_CLUSTER_NAME=$ECS_CLUSTER_NAME ECS_SERVICE_NAME=$ECS_SERVICE_NAME deploy
+          make BUILD_TAG=$BUILD_TAG build-image-promote
+          make ECS_CLUSTER_NAME=$ECS_CLUSTER_NAME ECS_SERVICE_NAME=$ECS_SERVICE_NAME deploy
