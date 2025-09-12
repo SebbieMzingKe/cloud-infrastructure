@@ -20,7 +20,7 @@ data "aws_iam_policy_document" "execution_policy" {
   }
 
   statement {
-    actions = ["logs:CreateLogStream", "logs.PutLogEvents"]
+    actions = ["logs:CreateLogStream", "logs:PutLogEvents"]
 
     resources = [ 
         aws_cloudwatch_log_group.this.arn,

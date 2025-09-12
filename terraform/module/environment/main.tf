@@ -43,7 +43,7 @@ module "service" {
   image_tag         = var.name
   listener_arn      = module.cluster.listener_arn
   name              = "service"
-  paths             = "/"
+  paths             = ["/*"]
   port              = 8080
   vpc_id            = module.network.vpc_id
 

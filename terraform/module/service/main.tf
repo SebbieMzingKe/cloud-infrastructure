@@ -1,16 +1,16 @@
 module "parameter_secure" {
-  for_each = { for item in var.var.secrets : item => item }
+  for_each = { for item in var.secrets : item => item }
 
   source  = "terraform-aws-modules/ssm-parameter/aws"
   version = "1.1.2"
 
   ignore_value_changes = true
-  name                 = "${var.cluster_name}/services/${lower(replace(each.key, "_", "-"))}"
+  name                 = "/${var.cluster_name}/services/${lower(replace(each.key, "_", "-"))}"
   secure_type          = true
   value                = "example"
 }
 
-resource "aws_cloud_watch_log_group" "this" {
+resource "aws_cloudwatch_log_group" "this" {
   name              = local.fullname
   retention_in_days = var.log_retention
 }
@@ -64,7 +64,7 @@ resource "aws_ecs_task_definition" "this" {
       portMappings = var.port != null ? [{ containerPort = var.port }] : []
 
       environment = [
-        for item_name, item in varconfig : {
+        for item_name, item in var.config : {
           name  = upper(replace(item_name, "-", "_"))
           value = item
         }
@@ -80,7 +80,7 @@ resource "aws_ecs_task_definition" "this" {
       logConfiguration = {
         logDriver = "awslogs"
         options = {
-          "awslogs-group"         = aws_cloudwatch_log_group
+          "awslogs-group"         = aws_cloudwatch_log_group.this.name
           "awslogs-region"        = data.aws_region.this.name
           "awslogs-stream-prefix" = "svc"
         }
@@ -126,7 +126,7 @@ resource "aws_lb_listener_rule" "service" {
 
 
 resource "aws_ecs_service" "this" {
-  cluster         = ar.cluster_id
+  cluster         = var.cluster_id
   desired_count   = 1
   iam_role        = aws_iam_role.service.arn
   name            = local.fullname
@@ -144,5 +144,5 @@ resource "aws_ecs_service" "this" {
     target_group_arn = aws_lb_target_group.service.arn
   }
 
-  depends_on = [aws_iam_role_policy_attachment.execution_ec2.service]
+  depends_on = [aws_iam_role_policy_attachment.service]
 }
