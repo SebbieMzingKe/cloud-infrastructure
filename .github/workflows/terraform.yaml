@@ -89,5 +89,5 @@ jobs:
       - run: terraform init
         working-directory: ./terraform
 
-      - run: terraform apply -out "terraform.tfplan"
+      - run: terraform apply "terraform.tfplan"
         working-directory: ./terraform
